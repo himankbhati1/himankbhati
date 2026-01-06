@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ROS2 Simulation | Himank Bhati</title>
+  <style>
+    /* --- PAGE SPECIFIC STYLES (Blue/Simulation Theme) --- */
+
+    body {
+      background-color: #050a14;
+      margin: 0;
+      padding: 0;
+      color: #cbd5e1;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      /* Simulation Grid Background */
+      background-image: 
+        linear-gradient(rgba(79, 124, 255, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(79, 124, 255, 0.1) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+
+    /* --- NAVBAR STYLES (Fixed Missing Top Bar) --- */
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 40px;
+      background: rgba(5, 10, 20, 0.95);
+      border-bottom: 1px solid rgba(79, 124, 255, 0.2);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      backdrop-filter: blur(10px);
+    }
+
+    .logo {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: #fff;
+      text-transform: uppercase;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 30px;
+    }
+
+    .nav-links a {
+      color: #a3a3a3;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 0.3s ease;
+    }
+
+    .nav-links a:hover {
+      color: #4f7cff;
+    }
+
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      cursor: pointer;
+      gap: 5px;
+    }
+
+    .bar {
+      width: 25px;
+      height: 3px;
+      background-color: #fff;
+      transition: 0.3s;
+    }
+
+    /* --- SIDEBAR LAYOUT --- */
+    .doc-container {
+      max-width: 1300px;
+      margin: 60px auto 100px; /* Adjusted top margin since navbar is sticky */
+      padding: 0 20px;
+      display: grid;
+      grid-template-columns: 250px 1fr;
+      gap: 60px;
+    }
+
+    .doc-sidebar {
+      position: sticky;
+      top: 100px;
+      height: fit-content;
+      padding-right: 20px;
+      border-right: 1px solid rgba(79, 124, 255, 0.3);
+    }
+
+    .doc-nav-title {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #9bbcff;
+      margin-bottom: 20px;
+      font-weight: 700;
+    }
+
+    .doc-nav a {
+      display: block;
+      color: #a3a3a3;
+      text-decoration: none;
+      padding: 10px 0;
+      font-size: 15px;
+      transition: 0.2s;
+      border-left: 2px solid transparent;
+      padding-left: 15px;
+    }
+
+    .doc-nav a:hover, .doc-nav a.active {
+      color: #4f7cff;
+      border-left-color: #4f7cff;
+    }
+
+    /* --- HERO SECTION --- */
+    .sim-hero {
+      padding: 40px 0 80px;
+      position: relative;
+    }
+
+    .sim-title {
+      font-size: clamp(40px, 6vw, 76px);
+      font-weight: 900;
+      margin-bottom: 20px;
+      background: linear-gradient(to right, #4f7cff, #00c6ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 40px rgba(79, 124, 255, 0.25);
+      line-height: 1.1;
+    }
+
+    .pkg-badge {
+      border: 1px solid #4f7cff;
+      color: #4f7cff;
+      padding: 5px 12px;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      border-radius: 4px;
+      background: rgba(79, 124, 255, 0.1);
+      margin-bottom: 20px;
+      display: inline-block;
+      font-family: 'Courier New', monospace;
+      font-weight: 700;
+    }
+
+    /* --- CODE SNIPPET (URDF/PYTHON) --- */
+    .code-window {
+      background: #1e1e1e;
+      border-radius: 8px;
+      border: 1px solid #333;
+      font-family: 'Courier New', monospace;
+      margin: 20px 0 40px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    .code-header {
+      background: #252526;
+      padding: 10px 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #333;
+    }
+
+    .window-controls { display: flex; gap: 8px; }
+    .code-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .file-name { font-size: 12px; color: #888; }
+
+    .code-body { 
+      padding: 20px; 
+      overflow-x: auto; 
+      color: #d4d4d4; 
+      font-size: 13px; 
+      line-height: 1.5; 
+      white-space: pre; 
+    }
+
+    /* Syntax Highlighting */
+    .tag { color: #569cd6; } 
+    .attr { color: #9cdcfe; } 
+    .val { color: #ce9178; } 
+    .com { color: #6a9955; font-style: italic; }
+    .py-kw { color: #c586c0; }
+    .py-func { color: #dcdcaa; }
+    .py-str { color: #ce9178; }
+    .py-cls { color: #4ec9b0; }
+
+    /* --- MEDIA GALLERY --- */
+    .sim-gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      gap: 30px;
+      margin-bottom: 60px;
+    }
+
+    .media-card {
+      background: rgba(11, 19, 36, 0.6);
+      border: 1px solid rgba(79, 124, 255, 0.2);
+      border-radius: 12px;
+      padding: 10px;
+      position: relative;
+      transition: transform 0.2s;
+    }
+    
+    .media-card:hover {
+        transform: translateY(-5px);
+        border-color: #4f7cff;
+    }
+
+    .media-card video, .media-card img {
+      width: 100%;
+      height: 300px;
+      object-fit: cover;
+      border-radius: 8px;
+      background: #000;
+    }
+
+    .media-caption {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      background: rgba(0,0,0,0.7);
+      color: #9bbcff;
+      padding: 5px 10px;
+      font-size: 12px;
+      border-radius: 4px;
+      backdrop-filter: blur(4px);
+      font-family: 'Courier New', monospace;
+    }
+
+    /* --- CONTENT TYPOGRAPHY --- */
+    .doc-section { margin-bottom: 80px; scroll-margin-top: 140px; }
+    .doc-section h2 { font-size: 28px; color: white; margin-bottom: 20px; border-bottom: 1px solid rgba(79, 124, 255, 0.3); padding-bottom: 10px; }
+    .doc-section p, .doc-section li { color: #cbd5e1; font-size: 17px; line-height: 1.8; margin-bottom: 15px; }
+    .doc-section strong { color: #9bbcff; }
+
+    /* Responsive */
+    @media (max-width: 850px) {
+      .doc-container { grid-template-columns: 1fr; }
+      .doc-sidebar { border-right: none; border-bottom: 1px solid rgba(79, 124, 255, 0.2); margin-bottom: 40px; position: static; }
+      .doc-nav { display: flex; overflow-x: auto; gap: 15px; }
+      .sim-gallery { grid-template-columns: 1fr; }
+      
+      .hamburger { display: flex; }
+      .nav-links { display: none; width: 100%; position: absolute; top: 70px; left: 0; background: #050a14; flex-direction: column; padding: 20px; border-bottom: 1px solid #333; }
+      .nav-links.active { display: flex; }
+    }
+  </style>
+</head>
+
+<body>
+
+<header class="navbar">
+  <div class="logo">HIMANK BHATI</div>
+  <div class="hamburger">
+    <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+  </div>
+  <nav class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="index.html#work">Work</a>
+    <a href="index.html#connect">Connect</a>
+  </nav>
+</header>
+
+<div class="doc-container">
+
+  <aside class="doc-sidebar">
+    <div class="doc-nav-title">Package Explorer</div>
+    <nav class="doc-nav">
+      <a href="#overview" class="active">01. Overview</a>
+      <a href="#visuals">02. Simulation Gallery</a>
+      <a href="#urdf">03. Robot Description</a>
+      <a href="#launch">04. Launch System</a>
+      <a href="#results">05. Results</a>
+    </nav>
+    <div style="margin-top: 40px;">
+      <a href="index.html#work" style="color: #666; text-decoration: none; font-size: 14px;">← Back to Portfolio</a>
+    </div>
+  </aside>
+
+  <main class="doc-content">
+
+    <section id="overview" class="doc-section">
+      <div class="pkg-badge">ROS2 HUMBLE • GAZEBO • RVIZ</div>
+      <h1 class="sim-title">Differential Drive<br>Simulation</h1>
+      
+      <p>
+        <strong>Objective:</strong> To develop a high-fidelity digital twin of a 4-wheeled differential drive robot, enabling risk-free testing of navigation algorithms and control logic before hardware deployment.
+      </p>
+      <p>
+        This project bridges the gap between CAD and Code. By creating a complete <strong>URDF</strong> description and integrating it with <strong>ros2_control</strong>, I simulated realistic wheel dynamics, joint limits, and sensor feedback loops within the Gazebo physics engine.
+      </p>
+    </section>
+
+    <section id="visuals" class="doc-section">
+      <h2>02. Simulation Visuals</h2>
+      <p>Visualizing the robot in both the physics engine (Gazebo) and the sensor data visualizer (RViz).</p>
+      
+      <div class="sim-gallery">
+        <div class="media-card">
+          <img src="gazebo.png" alt="Robot in Gazebo Office World">
+          <div class="media-caption">FIG 1: GAZEBO OFFICE WORLD</div>
+        </div>
+
+        <div class="media-card">
+          <video controls autoplay loop muted playsinline>
+            <source src="ros_rviz.webm" type="video/webm">
+            Your browser does not support the video tag.
+          </video>
+          <div class="media-caption">VID 1: RVIZ SENSOR FUSION</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="urdf" class="doc-section">
+      <h2>03. Full Robot Description (URDF)</h2>
+      <p>
+        The robot physics are defined in <code>my_robot.urdf</code>. This includes link geometry, inertial properties, and two key plugins: the <strong>Differential Drive</strong> controller and the <strong>Lidar Ray Sensor</strong>.
+      </p>
+
+      <div class="code-window">
+        <div class="code-header">
+          <div class="window-controls">
+            <div class="code-dot" style="background:#ff5f56"></div>
+            <div class="code-dot" style="background:#ffbd2e"></div>
+            <div class="code-dot" style="background:#27c93f"></div>
+          </div>
+          <span class="file-name">my_robot.urdf</span>
+        </div>
+        <div class="code-body">
+&lt;?xml version=<span class="val">"1.0"</span>?&gt;
+<span class="tag">&lt;robot</span> <span class="attr">name=</span><span class="val">"my_robot"</span><span class="tag">&gt;</span>
+    
+    <span class="com">&lt;!-- MATERIALS --&gt;</span>
+    <span class="tag">&lt;material</span> <span class="attr">name=</span><span class="val">"grey"</span><span class="tag">&gt;</span>
+        <span class="tag">&lt;color</span> <span class="attr">rgba=</span><span class="val">"0.5 0.5 0.5 1"</span> <span class="tag">/&gt;</span>
+    <span class="tag">&lt;/material&gt;</span>
+
+    <span class="tag">&lt;material</span> <span class="attr">name=</span><span class="val">"white"</span><span class="tag">&gt;</span>
+        <span class="tag">&lt;color</span> <span class="attr">rgba=</span><span class="val">"1 1 1 1"</span> <span class="tag">/&gt;</span>
+    <span class="tag">&lt;/material&gt;</span>
+
+    <span class="tag">&lt;material</span> <span class="attr">name=</span><span class="val">"blue"</span><span class="tag">&gt;</span>
+        <span class="tag">&lt;color</span> <span class="attr">rgba=</span><span class="val">"0 0 1 1"</span> <span class="tag">/&gt;</span>
+    <span class="tag">&lt;/material&gt;</span>
+    
+    <span class="com">&lt;!-- GAZEBO REFERENCES --&gt;</span>
+    <span class="tag">&lt;gazebo</span> <span class="attr">reference=</span><span class="val">"base_link"</span><span class="tag">&gt;</span>
+        <span class="tag">&lt;mu1&gt;</span>0.2<span class="tag">&lt;/mu1&gt;</span>
+        <span class="tag">&lt;mu2&gt;</span>0.2<span class="tag">&lt;/mu2&gt;</span>
+        <span class="tag">&lt;material&gt;</span>Gazebo/Grey<span class="tag">&lt;/material&gt;</span>
+    <span class="tag">&lt;/gazebo&gt;</span>
+
+    <span class="tag">&lt;gazebo</span> <span class="attr">reference=</span><span class="val">"lidar"</span><span class="tag">&gt;</span>
+        <span class="tag">&lt;mu1&gt;</span>0.2<span class="tag">&lt;/mu1&gt;</span>
+        <span class="tag">&lt;mu2&gt;</span>0.2<span class="tag">&lt;/mu2&gt;</span>
+        <span class="tag">&lt;material&gt;</span>Gazebo/Blue<span class="tag">&lt;/material&gt;</span>
+    <span class="tag">&lt;/gazebo&gt;</span>
+
+    <span class="tag">&lt;gazebo</span> <span class="attr">reference=</span><span class="val">"front_left_wheel"</span><span class="tag">&gt;</span>
+        <span class="tag">&lt;mu1&gt;</span>1.0<span class="tag">&lt;/mu1&gt;</span>
+        <span class="tag">&lt;mu2&gt;</span>1.0<span class="tag">&lt;/mu2&gt;</span>
+        <span class="tag">&lt;material&gt;</span>Gazebo/Yellow<span class="tag">&lt;/material&gt;</span>
+    <span class="tag">&lt;/gazebo&gt;</span>
+
+    <span class="tag">&lt;gazebo</span> <span class="attr">reference=</span><span class="val">"front_right_wheel"</span><span class="tag">&gt;</span>
+        <span class="tag">&lt;mu1&gt;</span>1.0<span class="tag">&lt;/mu1&gt;</span>
+        <span class="tag">&lt;mu2&gt;</span>1.0<span class="tag">&lt;/mu2&gt;</span>
+        <span class="tag">&lt;material&gt;</span>Gazebo/Yellow<span class="tag">&lt;/material&gt;</span>
+    <span class="tag">&lt;/gazebo&gt;</span>
+
+    <span class="tag">&lt;gazebo</span> <span class="attr">reference=</span><span class="val">"rear_left_wheel"</span><span class="tag">&gt;</span>
+        <span class="tag">&lt;mu1&gt;</span>0.2<span class="tag">&lt;/mu1&gt;</span>
+        <span class="tag">&lt;mu2&gt;</span>0.2<span class="tag">&lt;/mu2&gt;</span>
+        <span class="tag">&lt;material&gt;</span>Gazebo/Yellow<span class="tag">&lt;/material&gt;</span>
+    <span class="tag">&lt;/gazebo&gt;</span>
+
+    <span class="tag">&lt;gazebo</span> <span class="attr">reference=</span><span class="val">"rear_right_wheel"</span><span class="tag">&gt;</span>
+        <span class="tag">&lt;mu1&gt;</span>0.2<span class="tag">&lt;/mu1&gt;</span>
+        <span class="tag">&lt;mu2&gt;</span>0.2<span class="tag">&lt;/mu2&gt;</span>
+        <span class="tag">&lt;material&gt;</span>Gazebo/Yellow<span class="tag">&lt;/material&gt;</span>
+    <span class="tag">&lt;/gazebo&gt;</span>
+
+    <span class="com">&lt;!-- LINKS --&gt;</span>
+    <span class="tag">&lt;link</span> <span class="attr">name=</span><span class="val">"base_footprint"</span> <span class="tag">/&gt;</span>
+
+    <span class="tag">&lt;link</span> <span class="attr">name=</span><span class="val">"base_link"</span><span class="tag">&gt;</span>
+        <span class="tag">&lt;visual&gt;</span>
+            <span class="tag">&lt;geometry&gt;</span>
+                <span class="tag">&lt;box</span> <span class="attr">size=</span><span class="val">"0.6 0.4 0.2"</span> <span class="tag">/&gt;</span>
+            <span class="tag">&lt;/geometry&gt;</span>
+            <span class="tag">&lt;origin</span> <span class="attr">xyz=</span><span class="val">"0 0 0.1"</span> <span class="attr">rpy=</span><span class="val">"0 0 0"</span> <span class="tag">/&gt;</span>
+            <span class="tag">&lt;material</span> <span class="attr">name=</span><span class="val">"grey"</span> <span class="tag">/&gt;</span>
+        <span class="tag">&lt;/visual&gt;</span>  
+        <span class="tag">&lt;collision&gt;</span>
+            <span class="tag">&lt;geometry&gt;</span>
+                <span class="tag">&lt;box</span> <span class="attr">size=</span><span class="val">"0.6 0.4 0.2"</span> <span class="tag">/&gt;</span>
+            <span class="tag">&lt;/geometry&gt;</span>
+            <span class="tag">&lt;origin</span> <span class="attr">xyz=</span><span class="val">"0 0 0.1"</span> <span class="attr">rpy=</span><span class="val">"0 0 0"</span> <span class="tag">/&gt;</span>
+        <span class="tag">&lt;/collision&gt;</span>  
+        <span class="tag">&lt;inertial&gt;</span>
+            <span class="tag">&lt;origin</span> <span class="attr">xyz=</span><span class="val">"0 0 0.1"</span> <span class="attr">rpy=</span><span class="val">"0 0 0"</span><span class="tag">/&gt;</span>
+            <span class="tag">&lt;mass</span> <span class="attr">value=</span><span class="val">"5.0"</span><span class="tag">/&gt;</span>
+            <span class="tag">&lt;inertia</span> <span class="attr">ixx=</span><span class="val">"0.1167"</span> <span class="attr">ixy=</span><span class="val">"0.0"</span> <span class="attr">ixz=</span><span class="val">"0.0"</span>
+                <span class="attr">iyy=</span><span class="val">"0.17"</span>   <span class="attr">iyz=</span><span class="val">"0.0"</span>
+                <span class="attr">izz=</span><span class="val">"0.26"</span><span class="tag">/&gt;</span>
+        <span class="tag">&lt;/inertial&gt;</span>
+    <span class="tag">&lt;/link&gt;</span>
+
+    <span class="tag">&lt;link</span> <span class="attr">name=</span><span class="val">"lidar"</span><span class="tag">&gt;</span>
+        <span class="tag">&lt;visual&gt;</span>
+            <span class="tag">&lt;geometry&gt;</span>
+                <span class="tag">&lt;cylinder</span> <span class="attr">radius=</span><span class="val">"0.05"</span> <span class="attr">length=</span><span class="val">"0.05"</span> <span class="tag">/&gt;</span>
+            <span class="tag">&lt;/geometry&gt;</span>
+            <span class="tag">&lt;origin</span> <span class="attr">xyz=</span><span class="val">"0 0 0"</span> <span class="attr">rpy=</span><span class="val">"0 0 0"</span> <span class="tag">/&gt;</span>
+            <span class="tag">&lt;material</span> <span class="attr">name=</span><span class="val">"blue"</span> <span class="tag">/&gt;</span>
+        <span class="tag">&lt;/visual&gt;</span>
+        <span class="tag">&lt;collision&gt;</span>
+            <span class="tag">&lt;geometry&gt;</span>
+                <span class="tag">&lt;cylinder</span> <span class="attr">radius=</span><span class="val">"0.05"</span> <span class="attr">length=</span><span class="val">"0.05"</span> <span class="tag">/&gt;</span>
+            <span class="tag">&lt;/geometry&gt;</span>
+            <span class="tag">&lt;origin</span> <span class="attr">xyz=</span><span class="val">"0 0 0"</span> <span class="attr">rpy=</span><span class="val">"0 0 0"</span> <span class="tag">/&gt;</span>
+        <span class="tag">&lt;/collision&gt;</span>
+        <span class="tag">&lt;inertial&gt;</span>
+            <span class="tag">&lt;origin</span> <span class="attr">xyz=</span><span class="val">"0 0 0"</span> <span class="attr">rpy=</span><span class="val">"0 0 0"</span><span class="tag">/&gt;</span>
+            <span class="tag">&lt;mass</span> <span class="attr">value=</span><span class="val">"0.2"</span><span class="tag">/&gt;</span>
+            <span class="tag">&lt;inertia</span> <span class="attr">ixx=</span><span class="val">"0.0001458"</span> <span class="attr">ixy=</span><span class="val">"0.0"</span> <span class="attr">ixz=</span><span class="val">"0.0"</span>
+                    <span class="attr">iyy=</span><span class="val">"0.0001458"</span> <span class="attr">iyz=</span><span class="val">"0.0"</span>
+                    <span class="attr">izz=</span><span class="val">"0.00025"</span><span class="tag">/&gt;</span>
+        <span class="tag">&lt;/inertial&gt;</span>
+    <span class="tag">&lt;/link&gt;</span>
+
+    <span class="tag">&lt;link</span> <span class="attr">name=</span><span class="val">"front_left_wheel"</span> <span class="tag">&gt;</span>
+        <span class="tag">&lt;visual&gt;</span>
+            <span class="tag">&lt;geometry&gt;</span>
+                <span class="tag">&lt;cylinder</span> <span class="attr">radius=</span><span class="val">"0.1"</span> <span class="attr">length=</span><span class="val">"0.05"</span> <span class="tag">/&gt;</span>
+            <span class="tag">&lt;/geometry&gt;</span>
+            <span class="tag">&lt;origin</span> <span class="attr">xyz=</span><span class="val">"0 0 0"</span> <span class="attr">rpy=</span><span class="val">"1.57 0 0"</span> <span class="tag">/&gt;</span>
+            <span class="tag">&lt;material</span> <span class="attr">name=</span><span class="val">"white"</span> <span class="tag">/&gt;</span>
+        <span class="tag">&lt;/visual&gt;</span>
+        <span class="tag">&lt;collision&gt;</span>
+            <span class="tag">&lt;geometry&gt;</span>
+                <span class="tag">&lt;cylinder</span> <span class="attr">radius=</span><span class="val">"0.1"</span> <span class="attr">length=</span><span class="val">"0.05"</span> <span class="tag">/&gt;</span>
+            <span class="tag">&lt;/geometry&gt;</span>
+            <span class="tag">&lt;origin</span> <span class="attr">xyz=</span><span class="val">"0 0 0"</span> <span class="attr">rpy=</span><span class="val">"1.57 0 0"</span> <span class="tag">/&gt;</span>
+        <span class="tag">&lt;/collision&gt;</span>
+        <span class="tag">&lt;inertial&gt;</span>
+            <span class="tag">&lt;origin</span> <span class="attr">xyz=</span><span class="val">"0 0 0"</span> <span class="attr">rpy=</span><span class="val">"0 0 0"</span><span class="tag">/&gt;</span>
+                <span class="tag">&lt;mass</span> <span class="attr">value=</span><span class="val">"0.5"</span><span class="tag">/&gt;</span>
+                <span class="tag">&lt;inertia</span> <span class="attr">ixx=</span><span class="val">"0.0013958"</span> <span class="attr">ixy=</span><span class="val">"0.0"</span> <span class="attr">ixz=</span><span class="val">"0.0"</span>
+                        <span class="attr">iyy=</span><span class="val">"0.0013958"</span> <span class="attr">iyz=</span><span class="val">"0.0"</span>
+                        <span class="attr">izz=</span><span class="val">"0.0025"</span><span class="tag">/&gt;</span>
+        <span class="tag">&lt;/inertial&gt;</span>
+    <span class="tag">&lt;/link&gt;</span>
+
+    <span class="tag">&lt;link</span> <span class="attr">name=</span><span class="val">"front_right_wheel"</span> <span class="tag">&gt;</span>
+        <span class="tag">&lt;visual&gt;</span>
+            <span class="tag">&lt;geometry&gt;</span>
+                <span class="tag">&lt;cylinder</span> <span class="attr">radius=</span><span class="val">"0.1"</span> <span class="attr">length=</span><span class="val">"0.05"</span> <span class="tag">/&gt;</span>
+            <span class="tag">&lt;/geometry&gt;</span>
+            <span class="tag">&lt;origin</span> <span class="attr">xyz=</span><span class="val">"0 0 0"</span> <span class="attr">rpy=</span><span class="val">"1.57 0 0"</span> <span class="tag">/&gt;</span>
+            <span class="tag">&lt;material</span> <span class="attr">name=</span><span class="val">"white"</span> <span class="tag">/&gt;</span>
+        <span class="tag">&lt;/visual&gt;</span>
+        <span class="tag">&lt;collision&gt;</span>
+            <span class="tag">&lt;geometry&gt;</span>
+                <span class="tag">&lt;cylinder</span> <span class="attr">radius=</span><span class="val">"0.1"</span> <span class="attr">length=</span><span class="val">"0.05"</span> <span class="tag">/&gt;</span>
+            <span class="tag">&lt;/geometry&gt;</span>
+            <span class="tag">&lt;origin</span> <span class="attr">xyz=</span><span class="val">"0 0 0"</span> <span class="attr">rpy=</span><span class="val">"1.57 0 0"</span> <span class="tag">/&gt;</span>
+        <span class="tag">&lt;/collision&gt;</span>
+        <span class="tag">&lt;inertial&gt;</span>
+            <span class="tag">&lt;origin</span> <span class="attr">xyz=</span><span class="val">"0 0 0"</span> <span class="attr">rpy=</span><span class="val">"0 0 0"</span><span class="tag">/&gt;</span>
+            <span class="tag">&lt;mass</span> <span class="attr">value=</span><span class="val">"0.5"</span><span class="tag">/&gt;</span>
+            <span class="tag">&lt;inertia</span> <span class="attr">ixx=</span><span class="val">"0.0013958"</span> <span class="attr">ixy=</span><span class="val">"0.0"</span> <span class="attr">ixz=</span><span class="val">"0.0"</span>
+                <span class="attr">iyy=</span><span class="val">"0.0013958"</span> <span class="attr">iyz=</span><span class="val">"0.0"</span>
+                <span class="attr">izz=</span><span class="val">"0.0025"</span><span class="tag">/&gt;</span>
+        <span class="tag">&lt;/inertial&gt;</span>
+    <span class="tag">&lt;/link&gt;</span>
+
+    <span class="tag">&lt;link</span> <span class="attr">name=</span><span class="val">"rear_left_wheel"</span> <span class="tag">&gt;</span>
+        <span class="tag">&lt;visual&gt;</span>
+            <span class="tag">&lt;geometry&gt;</span>
+                <span class="tag">&lt;cylinder</span> <span class="attr">radius=</span><span class="val">"0.1"</span> <span class="attr">length=</span><span class="val">"0.05"</span> <span class="tag">/&gt;</span>
+            <span class="tag">&lt;/geometry&gt;</span>
+            <span class="tag">&lt;origin</span> <span class="attr">xyz=</span><span class="val">"0 0 0"</span> <span class="attr">rpy=</span><span class="val">"1.57 0 0"</span> <span class="tag">/&gt;</span>
+            <span class="tag">&lt;material</span> <span class="attr">name=</span><span class="val">"white"</span> <span class="tag">/&gt;</span>
+        <span class="tag">&lt;/visual&gt;</span>
+        <span class="tag">&lt;collision&gt;</span>
+            <span class="tag">&lt;geometry&gt;</span>
+                <span class="tag">&lt;cylinder</span> <span class="attr">radius=</span><span class="val">"0.1"</span> <span class="attr">length=</span><span class="val">"0.05"</span> <span class="tag">/&gt;</span>
+            <span class="tag">&lt;/geometry&gt;</span>
+            <span class="tag">&lt;origin</span> <span class="attr">xyz=</span><span class="val">"0 0 0"</span> <span class="attr">rpy=</span><span class="val">"1.57 0 0"</span> <span class="tag">/&gt;</span>
+        <span class="tag">&lt;/collision&gt;</span>
+        <span class="tag">&lt;inertial&gt;</span>
+            <span class="tag">&lt;origin</span> <span class="attr">xyz=</span><span class="val">"0 0 0"</span> <span class="attr">rpy=</span><span class="val">"0 0 0"</span><span class="tag">/&gt;</span>
+            <span class="tag">&lt;mass</span> <span class="attr">value=</span><span class="val">"0.5"</span><span class="tag">/&gt;</span>
+            <span class="tag">&lt;inertia</span> <span class="attr">ixx=</span><span class="val">"0.0013958"</span> <span class="attr">ixy=</span><span class="val">"0.0"</span> <span class="attr">ixz=</span><span class="val">"0.0"</span>
+                <span class="attr">iyy=</span><span class="val">"0.0013958"</span> <span class="attr">iyz=</span><span class="val">"0.0"</span>
+                <span class="attr">izz=</span><span class="val">"0.0025"</span><span class="tag">/&gt;</span>
+        <span class="tag">&lt;/inertial&gt;</span>
+    <span class="tag">&lt;/link&gt;</span>
+
+    <span class="tag">&lt;link</span> <span class="attr">name=</span><span class="val">"rear_right_wheel"</span> <span class="tag">&gt;</span>
+        <span class="tag">&lt;visual&gt;</span>
+            <span class="tag">&lt;geometry&gt;</span>
+                <span class="tag">&lt;cylinder</span> <span class="attr">radius=</span><span class="val">"0.1"</span> <span class="attr">length=</span><span class="val">"0.05"</span> <span class="tag">/&gt;</span>
+            <span class="tag">&lt;/geometry&gt;</span>
+            <span class="tag">&lt;origin</span> <span class="attr">xyz=</span><span class="val">"0 0 0"</span> <span class="attr">rpy=</span><span class="val">"1.57 0 0"</span> <span class="tag">/&gt;</span>
+            <span class="tag">&lt;material</span> <span class="attr">name=</span><span class="val">"white"</span> <span class="tag">/&gt;</span>
+        <span class="tag">&lt;/visual&gt;</span>
+        <span class="tag">&lt;collision&gt;</span>
+            <span class="tag">&lt;geometry&gt;</span>
+                <span class="tag">&lt;cylinder</span> <span class="attr">radius=</span><span class="val">"0.1"</span> <span class="attr">length=</span><span class="val">"0.05"</span> <span class="tag">/&gt;</span>
+            <span class="tag">&lt;/geometry&gt;</span>
+            <span class="tag">&lt;origin</span> <span class="attr">xyz=</span><span class="val">"0 0 0"</span> <span class="attr">rpy=</span><span class="val">"1.57 0 0"</span> <span class="tag">/&gt;</span>
+        <span class="tag">&lt;/collision&gt;</span>
+        <span class="tag">&lt;inertial&gt;</span>
+            <span class="tag">&lt;origin</span> <span class="attr">xyz=</span><span class="val">"0 0 0"</span> <span class="attr">rpy=</span><span class="val">"0 0 0"</span><span class="tag">/&gt;</span>
+            <span class="tag">&lt;mass</span> <span class="attr">value=</span><span class="val">"0.5"</span><span class="tag">/&gt;</span>
+            <span class="tag">&lt;inertia</span> <span class="attr">ixx=</span><span class="val">"0.0013958"</span> <span class="attr">ixy=</span><span class="val">"0.0"</span> <span class="attr">ixz=</span><span class="val">"0.0"</span>
+                    <span class="attr">iyy=</span><span class="val">"0.0013958"</span> <span class="attr">iyz=</span><span class="val">"0.0"</span>
+                    <span class="attr">izz=</span><span class="val">"0.0025"</span><span class="tag">/&gt;</span>
+        <span class="tag">&lt;/inertial&gt;</span>
+    <span class="tag">&lt;/link&gt;</span>
+
+    <span class="com">&lt;!-- JOINTS --&gt;</span>
+    <span class="tag">&lt;joint</span> <span class="attr">name=</span><span class="val">"base_joint"</span> <span class="attr">type=</span><span class="val">"fixed"</span> <span class="tag">&gt;</span>
+        <span class="tag">&lt;parent</span> <span class="attr">link=</span><span class="val">"base_footprint"</span> <span class="tag">/&gt;</span>
+        <span class="tag">&lt;child</span> <span class="attr">link=</span><span class="val">"base_link"</span> <span class="tag">/&gt;</span>
+        <span class="tag">&lt;origin</span> <span class="attr">xyz=</span><span class="val">"0 0 0.1"</span> <span class="attr">rpy=</span><span class="val">"0 0 0"</span> <span class="tag">/&gt;</span>
+    <span class="tag">&lt;/joint&gt;</span>
+
+    <span class="tag">&lt;joint</span> <span class="attr">name=</span><span class="val">"base_lidar_joint"</span> <span class="attr">type=</span><span class="val">"fixed"</span> <span class="tag">&gt;</span>
+        <span class="tag">&lt;parent</span> <span class="attr">link=</span><span class="val">"base_link"</span> <span class="tag">/&gt;</span>
+        <span class="tag">&lt;child</span> <span class="attr">link=</span><span class="val">"lidar"</span> <span class="tag">/&gt;</span>
+        <span class="tag">&lt;origin</span> <span class="attr">xyz=</span><span class="val">"0 0 0.225"</span> <span class="attr">rpy=</span><span class="val">"0 0 0"</span> <span class="tag">/&gt;</span> 
+    <span class="tag">&lt;/joint&gt;</span>
+
+    <span class="tag">&lt;joint</span> <span class="attr">name=</span><span class="val">"front_left_wheel_joint"</span> <span class="attr">type=</span><span class="val">"continuous"</span> <span class="tag">&gt;</span>
+        <span class="tag">&lt;parent</span> <span class="attr">link=</span><span class="val">"base_link"</span> <span class="tag">/&gt;</span>
+        <span class="tag">&lt;child</span> <span class="attr">link=</span><span class="val">"front_left_wheel"</span> <span class="tag">/&gt;</span>
+        <span class="tag">&lt;origin</span> <span class="attr">xyz=</span><span class="val">"0.15 0.225 0"</span> <span class="attr">rpy=</span><span class="val">"0 0 0"</span> <span class="tag">/&gt;</span>
+        <span class="tag">&lt;axis</span> <span class="attr">xyz=</span><span class="val">"0 1 0"</span> <span class="tag">/&gt;</span>
+        <span class="tag">&lt;limit</span> <span class="attr">effort=</span><span class="val">"1000"</span> <span class="attr">velocity=</span><span class="val">"1000"</span> <span class="tag">/&gt;</span>
+        <span class="tag">&lt;dynamic</span> <span class="attr">damping=</span><span class="val">"1.0"</span> <span class="attr">friction=</span><span class="val">"2.0"</span> <span class="tag">/&gt;</span>
+    <span class="tag">&lt;/joint&gt;</span>
+
+    <span class="tag">&lt;joint</span> <span class="attr">name=</span><span class="val">"front_right_wheel_joint"</span> <span class="attr">type=</span><span class="val">"continuous"</span> <span class="tag">&gt;</span>
+        <span class="tag">&lt;parent</span> <span class="attr">link=</span><span class="val">"base_link"</span> <span class="tag">/&gt;</span>
+        <span class="tag">&lt;child</span> <span class="attr">link=</span><span class="val">"front_right_wheel"</span> <span class="tag">/&gt;</span>
+        <span class="tag">&lt;origin</span> <span class="attr">xyz=</span><span class="val">"0.15 -0.225 0"</span> <span class="attr">rpy=</span><span class="val">"0 0 0"</span> <span class="tag">/&gt;</span>
+        <span class="tag">&lt;axis</span> <span class="attr">xyz=</span><span class="val">"0 1 0"</span> <span class="tag">/&gt;</span>
+        <span class="tag">&lt;limit</span> <span class="attr">effort=</span><span class="val">"1000"</span> <span class="attr">velocity=</span><span class="val">"1000"</span> <span class="tag">/&gt;</span>
+        <span class="tag">&lt;dynamic</span> <span class="attr">damping=</span><span class="val">"1.0"</span> <span class="attr">friction=</span><span class="val">"2.0"</span> <span class="tag">/&gt;</span>
+    <span class="tag">&lt;/joint&gt;</span>
+    
+    <span class="tag">&lt;joint</span> <span class="attr">name=</span><span class="val">"rear_left_wheel_joint"</span> <span class="attr">type=</span><span class="val">"fixed"</span> <span class="tag">&gt;</span>
+        <span class="tag">&lt;parent</span> <span class="attr">link=</span><span class="val">"base_link"</span> <span class="tag">/&gt;</span>
+        <span class="tag">&lt;child</span> <span class="attr">link=</span><span class="val">"rear_left_wheel"</span> <span class="tag">/&gt;</span>
+        <span class="tag">&lt;origin</span> <span class="attr">xyz=</span><span class="val">"-0.15 0.225 0"</span> <span class="attr">rpy=</span><span class="val">"0 0 0"</span> <span class="tag">/&gt;</span>
+        <span class="tag">&lt;axis</span> <span class="attr">xyz=</span><span class="val">"0 1 0"</span> <span class="tag">/&gt;</span>
+    <span class="tag">&lt;/joint&gt;</span>
+
+    <span class="tag">&lt;joint</span> <span class="attr">name=</span><span class="val">"rear_right_wheel_joint"</span> <span class="attr">type=</span><span class="val">"fixed"</span> <span class="tag">&gt;</span>
+        <span class="tag">&lt;parent</span> <span class="attr">link=</span><span class="val">"base_link"</span> <span class="tag">/&gt;</span>
+        <span class="tag">&lt;child</span> <span class="attr">link=</span><span class="val">"rear_right_wheel"</span> <span class="tag">/&gt;</span>
+        <span class="tag">&lt;origin</span> <span class="attr">xyz=</span><span class="val">"-0.15 -0.225 0"</span> <span class="attr">rpy=</span><span class="val">"0 0 0"</span> <span class="tag">/&gt;</span>
+        <span class="tag">&lt;axis</span> <span class="attr">xyz=</span><span class="val">"0 1 0"</span> <span class="tag">/&gt;</span>
+    <span class="tag">&lt;/joint&gt;</span>
+    
+    <span class="com">&lt;!-- PLUGINS --&gt;</span>
+    <span class="tag">&lt;gazebo&gt;</span>
+        <span class="tag">&lt;plugin</span> <span class="attr">name=</span><span class="val">"diff_drive"</span> <span class="attr">filename=</span><span class="val">"libgazebo_ros_diff_drive.so"</span><span class="tag">&gt;</span>
+            <span class="tag">&lt;ros&gt;</span>
+                <span class="tag">&lt;namespace&gt;</span> <span class="tag">&lt;/namespace&gt;</span>
+            <span class="tag">&lt;/ros&gt;</span>
+            <span class="tag">&lt;num_wheel_pairs&gt;</span>1<span class="tag">&lt;/num_wheel_pairs&gt;</span>
+            <span class="tag">&lt;left_joint&gt;</span>front_left_wheel_joint<span class="tag">&lt;/left_joint&gt;</span>
+            <span class="tag">&lt;right_joint&gt;</span>front_right_wheel_joint<span class="tag">&lt;/right_joint&gt;</span>
+            <span class="tag">&lt;wheel_separation&gt;</span>0.45<span class="tag">&lt;/wheel_separation&gt;</span>
+            <span class="tag">&lt;wheel_diameter&gt;</span>0.1<span class="tag">&lt;/wheel_diameter&gt;</span>
+            <span class="tag">&lt;max_wheel_torque&gt;</span>10<span class="tag">&lt;/max_wheel_torque&gt;</span>
+            <span class="tag">&lt;max_wheel_acceleration&gt;</span>0.5<span class="tag">&lt;/max_wheel_acceleration&gt;</span>
+            <span class="tag">&lt;publish_odom&gt;</span>true<span class="tag">&lt;/publish_odom&gt;</span>
+            <span class="tag">&lt;publish_odom_tf&gt;</span>true<span class="tag">&lt;/publish_odom_tf&gt;</span>
+            <span class="tag">&lt;publish_wheel_tf&gt;</span>true<span class="tag">&lt;/publish_wheel_tf&gt;</span>
+            <span class="tag">&lt;odometry_frame&gt;</span>odom<span class="tag">&lt;/odometry_frame&gt;</span>
+            <span class="tag">&lt;robot_base_frame&gt;</span>base_footprint<span class="tag">&lt;/robot_base_frame&gt;</span>
+        <span class="tag">&lt;/plugin&gt;</span>
+    <span class="tag">&lt;/gazebo&gt;</span>
+
+    <span class="tag">&lt;gazebo</span> <span class="attr">reference=</span><span class="val">"lidar"</span><span class="tag">&gt;</span>
+        <span class="tag">&lt;sensor</span> <span class="attr">name=</span><span class="val">"lidar_sensor"</span> <span class="attr">type=</span><span class="val">"ray"</span><span class="tag">&gt;</span>
+        <span class="tag">&lt;pose&gt;</span>0 0 0 0 0 0<span class="tag">&lt;/pose&gt;</span>
+        <span class="tag">&lt;visualize&gt;</span>true<span class="tag">&lt;/visualize&gt;</span>
+        <span class="tag">&lt;update_rate&gt;</span>10<span class="tag">&lt;/update_rate&gt;</span>
+        <span class="tag">&lt;ray&gt;</span>
+            <span class="tag">&lt;scan&gt;</span>
+            <span class="tag">&lt;horizontal&gt;</span>
+                <span class="tag">&lt;samples&gt;</span>720<span class="tag">&lt;/samples&gt;</span>
+                <span class="tag">&lt;resolution&gt;</span>1<span class="tag">&lt;/resolution&gt;</span>
+                <span class="tag">&lt;min_angle&gt;</span>-3.14<span class="tag">&lt;/min_angle&gt;</span>
+                <span class="tag">&lt;max_angle&gt;</span>3.14<span class="tag">&lt;/max_angle&gt;</span>
+            <span class="tag">&lt;/horizontal&gt;</span>
+            <span class="tag">&lt;vertical&gt;</span>
+                <span class="tag">&lt;samples&gt;</span>1<span class="tag">&lt;/samples&gt;</span>
+                <span class="tag">&lt;resolution&gt;</span>0.1<span class="tag">&lt;/resolution&gt;</span>
+                <span class="tag">&lt;min_angle&gt;</span>0<span class="tag">&lt;/min_angle&gt;</span>
+                <span class="tag">&lt;max_angle&gt;</span>0<span class="tag">&lt;/max_angle&gt;</span>
+            <span class="tag">&lt;/vertical&gt;</span>
+            <span class="tag">&lt;/scan&gt;</span>
+            <span class="tag">&lt;range&gt;</span>
+            <span class="tag">&lt;min&gt;</span>0.1<span class="tag">&lt;/min&gt;</span>
+            <span class="tag">&lt;max&gt;</span>30.0<span class="tag">&lt;/max&gt;</span>
+            <span class="tag">&lt;resolution&gt;</span>0.01<span class="tag">&lt;/resolution&gt;</span>
+            <span class="tag">&lt;/range&gt;</span>
+            <span class="tag">&lt;noise&gt;</span>
+            <span class="tag">&lt;type&gt;</span>gaussian<span class="tag">&lt;/type&gt;</span>
+            <span class="tag">&lt;mean&gt;</span>0.0<span class="tag">&lt;/mean&gt;</span>
+            <span class="tag">&lt;stddev&gt;</span>0.01<span class="tag">&lt;/stddev&gt;</span>
+            <span class="tag">&lt;/noise&gt;</span>
+        <span class="tag">&lt;/ray&gt;</span>
+        <span class="tag">&lt;plugin</span> <span class="attr">name=</span><span class="val">"lidar_plugin"</span> <span class="attr">filename=</span><span class="val">"libgazebo_ros_ray_sensor.so"</span><span class="tag">&gt;</span>
+            <span class="tag">&lt;topicName&gt;</span>/scan<span class="tag">&lt;/topicName&gt;</span>
+            <span class="tag">&lt;frameName&gt;</span>lidar<span class="tag">&lt;/frameName&gt;</span>
+            <span class="tag">&lt;output_type&gt;</span>sensor_msgs/LaserScan<span class="tag">&lt;/output_type&gt;</span>
+        <span class="tag">&lt;/plugin&gt;</span>
+        <span class="tag">&lt;/sensor&gt;</span>
+    <span class="tag">&lt;/gazebo&gt;</span>
+
+<span class="tag">&lt;/robot&gt;</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="launch" class="doc-section">
+      <h2>04. Launch System</h2>
+      <p>
+        The project uses two distinct launch files. <code>display.launch.py</code> is used for local debugging with the Joint State Publisher GUI, while <code>gazebo.launch.py</code> handles the full physics simulation in Gazebo.
+      </p>
+
+      <div class="code-window">
+        <div class="code-header">
+          <div class="window-controls">
+            <div class="code-dot" style="background:#ff5f56"></div>
+            <div class="code-dot" style="background:#ffbd2e"></div>
+            <div class="code-dot" style="background:#27c93f"></div>
+          </div>
+          <span class="file-name">display.launch.py</span>
+        </div>
+        <div class="code-body">
+<span class="py-kw">from</span> launch <span class="py-kw">import</span> LaunchDescription
+<span class="py-kw">from</span> launch_ros.actions <span class="py-kw">import</span> Node
+<span class="py-kw">from</span> launch.substitutions <span class="py-kw">import</span> Command, PathJoinSubstitution
+<span class="py-kw">from</span> launch_ros.substitutions <span class="py-kw">import</span> FindPackageShare
+<span class="py-kw">import</span> os
+
+<span class="py-kw">def</span> <span class="py-func">generate_launch_description</span>():
+    urdf_path = <span class="py-cls">PathJoinSubstitution</span>([
+        <span class="py-cls">FindPackageShare</span>(<span class="py-str">"my_robot"</span>),
+        <span class="py-str">"urdf"</span>,
+        <span class="py-str">"my_robot.urdf"</span>
+    ])
+
+    robot_description = open(
+        os.path.join(
+            os.getenv(<span class="py-str">'AMENT_PREFIX_PATH'</span>).split(<span class="py-str">':'</span>)[0],
+            <span class="py-str">'share'</span>,
+            <span class="py-str">'my_robot'</span>,
+            <span class="py-str">'urdf'</span>,
+            <span class="py-str">'my_robot.urdf'</span>
+        )
+    ).read()
+
+    <span class="py-kw">return</span> <span class="py-cls">LaunchDescription</span>([
+        <span class="py-cls">Node</span>(
+            package=<span class="py-str">"joint_state_publisher_gui"</span>,
+            executable=<span class="py-str">"joint_state_publisher_gui"</span>,
+            name=<span class="py-str">"joint_state_publisher_gui"</span>,
+            output=<span class="py-str">"screen"</span>
+        ),
+        <span class="py-cls">Node</span>(
+            package=<span class="py-str">"robot_state_publisher"</span>,
+            executable=<span class="py-str">"robot_state_publisher"</span>,
+            name=<span class="py-str">"robot_state_publisher"</span>,
+            parameters=[{<span class="py-str">"robot_description"</span>: robot_description}]
+        ),
+        <span class="py-cls">Node</span>(
+            package=<span class="py-str">"rviz2"</span>,
+            executable=<span class="py-str">"rviz2"</span>,
+            name=<span class="py-str">"rviz2"</span>,
+            output=<span class="py-str">"screen"</span>
+        )  
+    ])
+        </div>
+      </div>
+
+      <div class="code-window">
+        <div class="code-header">
+          <div class="window-controls">
+            <div class="code-dot" style="background:#ff5f56"></div>
+            <div class="code-dot" style="background:#ffbd2e"></div>
+            <div class="code-dot" style="background:#27c93f"></div>
+          </div>
+          <span class="file-name">gazebo.launch.py</span>
+        </div>
+        <div class="code-body">
+<span class="py-kw">from</span> launch <span class="py-kw">import</span> LaunchDescription
+<span class="py-kw">from</span> launch.actions <span class="py-kw">import</span> IncludeLaunchDescription, DeclareLaunchArgument
+<span class="py-kw">from</span> launch.substitutions <span class="py-kw">import</span> LaunchConfiguration, PathJoinSubstitution
+<span class="py-kw">from</span> launch.launch_description_sources <span class="py-kw">import</span> PythonLaunchDescriptionSource
+<span class="py-kw">from</span> launch_ros.actions <span class="py-kw">import</span> Node
+<span class="py-kw">from</span> launch_ros.substitutions <span class="py-kw">import</span> FindPackageShare
+<span class="py-kw">import</span> os
+
+<span class="py-kw">def</span> <span class="py-func">generate_launch_description</span>():
+    <span class="com"># Paths and configs</span>
+    pkg_path = <span class="py-cls">FindPackageShare</span>(<span class="py-str">"my_robot"</span>)
+    urdf_file = <span class="py-cls">PathJoinSubstitution</span>([pkg_path, <span class="py-str">"urdf"</span>, <span class="py-str">"my_robot.urdf"</span>])
+    use_sim_time = <span class="py-cls">LaunchConfiguration</span>(<span class="py-str">"use_sim_time"</span>)
+
+     <span class="com"># Path to world file</span>
+    world_path = os.path.join(
+        os.environ[<span class="py-str">'HOME'</span>],
+        <span class="py-str">'ros2_ws'</span>, <span class="py-str">'src'</span>, <span class="py-str">'gazebo_models_worlds_collection'</span>, <span class="py-str">'worlds'</span>, <span class="py-str">'office_small.world'</span>
+    )
+
+    <span class="py-kw">return</span> <span class="py-cls">LaunchDescription</span>([
+
+        <span class="com"># Launch Gazebo with the selected world</span>
+        <span class="py-cls">IncludeLaunchDescription</span>(
+            <span class="py-cls">PythonLaunchDescriptionSource</span>([
+                <span class="py-cls">PathJoinSubstitution</span>([
+                    <span class="py-cls">FindPackageShare</span>(<span class="py-str">"gazebo_ros"</span>), <span class="py-str">"launch"</span>, <span class="py-str">"gazebo.launch.py"</span>
+                ])
+            ]),
+            launch_arguments={<span class="py-str">'world'</span>: world_path}.items()
+        ),
+        
+        <span class="com"># Declare use_sim_time argument</span>
+        <span class="py-cls">DeclareLaunchArgument</span>(
+            name=<span class="py-str">'use_sim_time'</span>,
+            default_value=<span class="py-str">'true'</span>,
+            description=<span class="py-str">'Use simulation (Gazebo) clock if true'</span>
+        ),
+
+        <span class="com"># Start robot_state_publisher</span>
+        <span class="py-cls">Node</span>(
+            package=<span class="py-str">"robot_state_publisher"</span>,
+            executable=<span class="py-str">"robot_state_publisher"</span>,
+            name=<span class="py-str">"robot_state_publisher"</span>,
+            output=<span class="py-str">"screen"</span>,
+            parameters=[{<span class="py-str">'use_sim_time'</span>: use_sim_time}],
+            arguments=[urdf_file]
+        ),
+
+        <span class="com"># Spawn robot in Gazebo</span>
+        <span class="py-cls">Node</span>(
+            package=<span class="py-str">"gazebo_ros"</span>,
+            executable=<span class="py-str">"spawn_entity.py"</span>,
+            arguments=[<span class="py-str">"-entity"</span>, <span class="py-str">"my_robot"</span>, <span class="py-str">"-file"</span>, urdf_file],
+            output=<span class="py-str">"screen"</span>
+        )
+    ])
+        </div>
+      </div>
+    </section>
+
+    <section id="results" class="doc-section">
+      <h2>05. Results</h2>
+      <p>
+        The simulation successfully mimics real-world physics. The Lidar sensor accurately visualizes the "Office World" environment in RViz, proving that the transform tree (TF) and sensor plugins are correctly configured. This platform is now ready for testing SLAM and Navigation2 stacks.
+      </p>
+      
+      <div style="margin-top: 60px; text-align: center;">
+        <p style="color: #666; margin-bottom: 20px;">Ready to collaborate?</p>
+        <a href="index.html#connect" class="btn talk-btn" style="display: inline-flex; text-decoration: none; color: white; background: rgba(79, 124, 255, 0.2); padding: 10px 20px; border-radius: 5px; border: 1px solid #4f7cff;">
+          Let's Talk Engineering →
+        </a>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  const hamburger = document.querySelector(".hamburger");
+  const navMenu = document.querySelector(".nav-links");
+  const sections = document.querySelectorAll(".doc-section");
+  const navLinks = document.querySelectorAll(".doc-nav a");
+
+  hamburger.addEventListener("click", () => {
+    hamburger.classList.toggle("active");
+    navMenu.classList.toggle("active");
+  });
+
+  // Scroll Spy
+  window.addEventListener("scroll", () => {
+    let current = "";
+    sections.forEach(sec => {
+      if (scrollY >= sec.offsetTop - 150) {
+        current = sec.getAttribute("id");
+      }
+    });
+    navLinks.forEach(link => {
+      link.classList.remove("active");
+      if (link.getAttribute("href").includes(current)) {
+        link.classList.add("active");
+      }
+    });
+  });
+</script>
+
+</body>
+</html>

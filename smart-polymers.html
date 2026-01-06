@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart Polymers Research | Himank Bhati</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* --- PAGE SPECIFIC STYLES (Pink/Purple Theme) --- */
+    
+    body {
+      background-color: #0b0510;
+      /* Grid background */
+      background-image: 
+        linear-gradient(rgba(232, 121, 249, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(232, 121, 249, 0.05) 1px, transparent 1px);
+      background-size: 40px 40px;
+      margin: 0;
+      font-family: sans-serif;
+    }
+
+    /* SIDEBAR LAYOUT */
+    .doc-container {
+      max-width: 1300px;
+      margin: 120px auto 100px;
+      padding: 0 20px;
+      display: grid;
+      grid-template-columns: 250px 1fr;
+      gap: 60px;
+    }
+
+    .doc-sidebar {
+      position: sticky;
+      top: 120px;
+      height: fit-content;
+      padding-right: 20px;
+      border-right: 1px solid rgba(232, 121, 249, 0.2);
+    }
+
+    .doc-nav-title {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #d8b4fe;
+      margin-bottom: 20px;
+      font-weight: 700;
+    }
+
+    .doc-nav a {
+      display: block;
+      color: #a8a29e;
+      text-decoration: none;
+      padding: 10px 0;
+      font-size: 15px;
+      transition: 0.2s;
+      border-left: 2px solid transparent;
+      padding-left: 15px;
+    }
+
+    .doc-nav a:hover, .doc-nav a.active {
+      color: #e879f9;
+      border-left-color: #e879f9;
+    }
+
+    /* CONTENT STYLES */
+    .doc-content h1 {
+      font-size: 42px;
+      font-weight: 800;
+      margin-bottom: 10px;
+      background: linear-gradient(to right, #e879f9, #fff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .doc-meta {
+      font-family: 'Courier New', monospace;
+      color: #e879f9;
+      margin-bottom: 40px;
+      font-size: 14px;
+      opacity: 0.8;
+    }
+
+    .doc-section {
+      margin-bottom: 80px;
+      scroll-margin-top: 140px;
+    }
+
+    .doc-section h2 {
+      font-size: 28px;
+      color: white;
+      margin-bottom: 20px;
+      border-bottom: 1px solid rgba(232, 121, 249, 0.3);
+      padding-bottom: 10px;
+    }
+
+    .doc-section p, .doc-section li {
+      color: #e9d5ff;
+      font-size: 17px;
+      line-height: 1.8;
+      margin-bottom: 15px;
+    }
+
+    /* LIT REVIEW CARDS */
+    .lit-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    .lit-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(232, 121, 249, 0.15);
+      border-radius: 12px;
+      padding: 20px;
+      transition: transform 0.2s;
+    }
+    
+    .lit-card:hover {
+      transform: translateY(-3px);
+      border-color: #e879f9;
+    }
+
+    .lit-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 8px;
+    }
+
+    .lit-author {
+      font-size: 13px;
+      color: #d8b4fe;
+      margin-bottom: 12px;
+      font-style: italic;
+    }
+
+    .lit-desc {
+      font-size: 14px;
+      color: #cbd5e1;
+      line-height: 1.5;
+    }
+
+    /* METHODOLOGY STEPS */
+    .step-list {
+      counter-reset: step;
+      list-style: none;
+      padding: 0;
+    }
+
+    .step-item {
+      position: relative;
+      padding-left: 50px;
+      margin-bottom: 30px;
+    }
+
+    .step-item::before {
+      counter-increment: step;
+      content: counter(step);
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 35px;
+      height: 35px;
+      background: #a855f7;
+      color: white;
+      border-radius: 50%;
+      text-align: center;
+      line-height: 35px;
+      font-weight: 700;
+    }
+
+    .step-title {
+      font-weight: 700;
+      color: white;
+      font-size: 18px;
+      margin-bottom: 5px;
+    }
+
+    /* SYMPOSIUM PHOTO & BUTTON */
+    .poster-showcase {
+      background: rgba(255,255,255,0.05);
+      border-radius: 16px;
+      padding: 30px;
+      text-align: center;
+      border: 1px solid rgba(255,255,255,0.1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+    
+    .poster-showcase img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      max-height: 500px;
+      object-fit: cover;
+    }
+
+    /* Pink Button Style */
+    .btn-pink {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 24px;
+      background: linear-gradient(90deg, #c77dff, #ff4d8d);
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 700;
+      transition: 0.2s;
+    }
+    .btn-pink:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(255, 77, 141, 0.3);
+    }
+
+    /* Orange Button Style (For Next Project) */
+    .btn-orange {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 24px;
+      background: linear-gradient(90deg, #ff8a00, #ff4d4d);
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 700;
+      transition: 0.2s;
+    }
+    .btn-orange:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(255, 138, 0, 0.3);
+    }
+
+    /* EXPERIMENTAL RESULTS IMAGE STYLE */
+    .experimental-image-container {
+      text-align: center;
+      margin: 30px 0;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      border: 1px solid rgba(232, 121, 249, 0.15);
+    }
+    .experimental-image-container img {
+      max-width: 100%;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+    .experimental-caption {
+      color: #d8b4fe;
+      font-size: 14px;
+      margin-top: 15px;
+      line-height: 1.6;
+    }
+    .experimental-caption strong {
+      color: #e879f9;
+    }
+
+    /* Navbar Styles */
+    .navbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 40px;
+        background: rgba(11, 5, 16, 0.9);
+        position: fixed;
+        width: 100%;
+        top: 0;
+        z-index: 1000;
+        box-sizing: border-box;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .logo { color: white; font-weight: 700; font-size: 20px; letter-spacing: 2px; }
+    .nav-links a { color: #ccc; margin-left: 30px; text-decoration: none; font-size: 14px; }
+    .hamburger { display: none; cursor: pointer; flex-direction: column; gap: 5px; }
+    .bar { width: 25px; height: 3px; background-color: white; border-radius: 2px; }
+
+    @media (max-width: 850px) {
+      .doc-container { grid-template-columns: 1fr; }
+      .doc-sidebar { border-right: none; border-bottom: 1px solid rgba(232, 121, 249, 0.2); margin-bottom: 40px; position: static; }
+      .doc-nav { display: flex; overflow-x: auto; gap: 15px; }
+      .doc-nav a { white-space: nowrap; border-left: none; border-bottom: 2px solid transparent; }
+      .doc-nav a.active { border-bottom-color: #e879f9; }
+      .navbar { padding: 20px; }
+      .nav-links { display: none; } 
+      .nav-links.active { display: flex; flex-direction: column; position: absolute; top: 70px; right: 0; background: #1a1a1a; width: 100%; padding: 20px; }
+      .hamburger { display: flex; }
+    }
+  </style>
+</head>
+
+<body>
+
+<header class="navbar">
+  <div class="logo">HIMANK BHATI</div>
+  <div class="hamburger">
+    <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+  </div>
+  <nav class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="index.html#work">Work</a>
+    <a href="index.html#connect">Connect</a>
+  </nav>
+</header>
+
+<div class="doc-container">
+
+  <aside class="doc-sidebar">
+    <div class="doc-nav-title">Project Contents</div>
+    <nav class="doc-nav">
+      <a href="#intro" class="active">01. Overview</a>
+      <a href="#lit-review">02. Literature Review</a>
+      <a href="#material">03. Material Selection</a>
+      <a href="#methodology">04. Methodology</a>
+      <a href="#results">05. Experimental Results</a>
+      <a href="#symposium">06. Symposium</a>
+    </nav>
+    <div style="margin-top: 40px;">
+      <a href="index.html#work" style="color: #a8a29e; text-decoration: none; font-size: 14px;">← Back to Portfolio</a>
+    </div>
+  </aside>
+
+  <main class="doc-content">
+
+    <section id="intro" class="doc-section">
+      <h1>SMP Emitter Membrane Design</h1>
+      <div class="doc-meta">
+        ADVISOR: DR. PUNNAG CHATTERJEE // LAB: SMART DYNAMICAL SYSTEMS (SDSL) // IIT DHARWAD
+      </div>
+
+      <p>
+        <strong>Objective:</strong> To design, fabricate, and experimentally evaluate a catalyst-free, biodegradable Shape Memory Polymer (SMP) membrane for potential use in emitter systems.
+      </p>
+      
+      <p>
+        Shape Memory Polymers are smart materials that can store a temporary shape and recover their original form when heated. Unlike traditional actuators, they offer large elastic deformation, tunable mechanical properties, and the ability to function without complex motors or gears.
+      </p>
+    </section>
+
+    <section id="lit-review" class="doc-section">
+      <h2>02. Literature Review &amp; Applications</h2>
+      <p>A comprehensive review of 10 key SMP technologies was conducted to identify the ideal material for membrane-based actuation.</p>
+      
+      <div class="lit-grid">
+        
+        <div class="lit-card">
+          <div class="lit-title">1. SMP Suture</div>
+          <div class="lit-author">Lendlein & Langer (2002)</div>
+          <div class="lit-desc">
+            A biodegradable OCL-ODX based suture that automatically tightens wounds by recovering its original shape at body temperature (37-40°C).
+          </div>
+        </div>
+
+        <div class="lit-card">
+          <div class="lit-title">2. SMP Staple</div>
+          <div class="lit-author">Huang et al. (2013)</div>
+          <div class="lit-desc">
+            A PLA-based biodegradable staple. It is programmed to shrink upon heating (~55°C), pulling tissue edges together for closure without manual tools.
+          </div>
+        </div>
+
+        <div class="lit-card">
+          <div class="lit-title">3. SMP Coil</div>
+          <div class="lit-author">Sreelatha et al. (2019)</div>
+          <div class="lit-desc">
+            UHMWPE-based coiled actuator fabricated via twist insertion. Achieves high contraction (87%) suitable for lightweight artificial muscles.
+          </div>
+        </div>
+
+        <div class="lit-card">
+          <div class="lit-title">4. SMP Hinge</div>
+          <div class="lit-author">Liu et al. (2018)</div>
+          <div class="lit-desc">
+            Carbon-fiber reinforced epoxy hinge for aerospace. Deploys structures (like solar arrays) reliably when heated above 100°C.
+          </div>
+        </div>
+
+        <div class="lit-card">
+          <div class="lit-title">5. Artificial Muscle</div>
+          <div class="lit-author">Kim et al. (2002)</div>
+          <div class="lit-desc">
+            High-energy-density PPG-MPU film. Uses nanostructure hydrogen bonding to lift loads up to 5000x its weight with rapid actuation.
+          </div>
+        </div>
+
+        <div class="lit-card">
+          <div class="lit-title">6. SMP Stent</div>
+          <div class="lit-author">Yakacki et al. (2007)</div>
+          <div class="lit-desc">
+            Acrylate-based polymer network that expands at body temperature. Eliminates the need for balloon expansion in vascular surgeries.
+          </div>
+        </div>
+
+        <div class="lit-card">
+          <div class="lit-title">7. PODDC SMP</div>
+          <div class="lit-author">Wong et al. (2023)</div>
+          <div class="lit-desc">
+            Catalyst-free, biodegradable polymer with a low activation temperature (~39°C). Selected for this project due to its safe biomedical profile.
+          </div>
+        </div>
+
+        <div class="lit-card">
+          <div class="lit-title">8. Magnetic SMP</div>
+          <div class="lit-author">Qiji Ze et al. (2019)</div>
+          <div class="lit-desc">
+            Composite containing Fe3O4 and NdFeB particles. Heats up and actuates remotely under AC magnetic fields for contactless control.
+          </div>
+        </div>
+
+        <div class="lit-card">
+          <div class="lit-title">9. PLMC Scaffold</div>
+          <div class="lit-author">Zhang et al. (2014)</div>
+          <div class="lit-desc">
+            Electrospun DLLA-TMC copolymer. A nanofibrous membrane that recovers shape rapidly (6-12 sec) for bone tissue engineering.
+          </div>
+        </div>
+
+        <div class="lit-card">
+          <div class="lit-title">10. Self-Healing SMP</div>
+          <div class="lit-author">Scalet et al. (2019)</div>
+          <div class="lit-desc">
+            PCLDMA-UPyMA based polymer. Uses reversible hydrogen bonding to automatically heal cuts/damage while retaining shape memory properties.
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <section id="material" class="doc-section">
+      <h2>03. Material Selection: PODDC</h2>
+      <p>
+        Based on the review, <strong>PODDC (Poly(octanediol-co-citrate)-co-dodecanedioate)</strong> was selected for this study.
+      </p>
+      <ul style="list-style: disc; padding-left: 20px; color: #d8b4fe;">
+        <li><strong>Low Activation Temp:</strong> Triggers around ~39°C, making it safe for biomedical and mild-thermal applications.</li>
+        <li><strong>Catalyst-Free:</strong> Synthesized using citric acid, making it non-toxic and biodegradable.</li>
+        <li><strong>Performance:</strong> Exhibits fast and complete recovery (20-30 seconds).</li>
+      </ul>
+    </section>
+
+    <section id="methodology" class="doc-section">
+      <h2>04. Fabrication Methodology</h2>
+      <p>The PODDC membrane was synthesized and cast using the following procedure:</p>
+      
+      <div class="step-list">
+        <div class="step-item">
+          <div class="step-title">Mold Preparation</div>
+          Clean Petri dish with ethanol. Apply Kapton tape as a non-stick surface and create spacers to define the membrane thickness.
+        </div>
+        
+        <div class="step-item">
+          <div class="step-title">Monomer Weighing</div>
+          Measure monomers in a <strong>1 : 0.5 : 0.5 molar ratio</strong> of 1,8-Octanediol (OD), Dodecanedioic acid (DDA), and Citric acid (CA).
+        </div>
+        
+        <div class="step-item">
+          <div class="step-title">Melt Preparation</div>
+          Heat the mixture at <strong>100-110°C</strong> while stirring until a uniform, transparent viscous melt is formed.
+        </div>
+
+        <div class="step-item">
+          <div class="step-title">Casting</div>
+          Pour the hot melt into the pre-warmed mold (60°C) and spread evenly using a warm spatula.
+        </div>
+
+        <div class="step-item">
+          <div class="step-title">Two-Stage Curing</div>
+          <strong>Stage I:</strong> Cure at 100°C for 24 hours (Partial crosslinking).<br>
+          <strong>Stage II:</strong> Cure at 120°C for 24 hours (Full crosslinking).
+        </div>
+      </div>
+    </section>
+
+    <section id="results" class="doc-section">
+      <h2>05. Experimental Results</h2>
+      <p>
+        The fabricated membrane demonstrated excellent shape memory behavior. The testing cycle involved:
+      </p>
+      <ol style="color: #e9d5ff; line-height: 1.8; margin-bottom: 30px;">
+        <li><strong>Permanent Shape:</strong> Established at 25°C.</li>
+        <li><strong>Programming:</strong> Heated to 50°C, deformed into a temporary shape, and cooled to 25°C to "freeze" the structure.</li>
+        <li><strong>Recovery:</strong> Reheated to 50°C, triggering a return to the original flat membrane shape.</li>
+      </ol>
+
+      <div class="experimental-image-container">
+        <img src="poddc.png" alt="Shape memory polymer membrane showing permanent shape, deformed temporary shapes, and recovered shape.">
+        <div class="experimental-caption">
+          <strong>a)</strong> Permanent shape at 25 °C.<br>
+          <strong>b)</strong> Heat membrane to 50 °C, deform to desired shape(s), then cool to 25 °C to fix temporary shapes.<br>
+          <strong>c)</strong> Reheat to 50 °C to trigger full shape recovery.
+        </div>
+      </div>
+
+      <p>
+        <strong>Conclusion:</strong> The PODDC membrane successfully proved viable for low-temperature actuation, confirming its potential for smart emitter systems where pressure regulation or flow control is required.
+      </p>
+    </section>
+
+    <section id="symposium" class="doc-section">
+      <h2>06. Shodha Yantriki-25 Symposium</h2>
+      <p>
+        Presented this research at the 5th MMAE Symposium at IIT Dharwad (Dec 2025).
+      </p>
+      
+      <div class="poster-showcase">
+        <img src="meandposter.jpg" alt="Himank Bhati presenting SMP Research Poster at IIT Dharwad">
+        
+        <div style="margin: 20px 0; font-size: 15px; color: #d8b4fe;">
+          "Shape Memory Polymer based Emitter Membrane Design"
+        </div>
+
+        <a href="HIMANK BHATI Poster.pdf" class="btn-pink" target="_blank">
+          View Full Poster PDF →
+        </a>
+      </div>
+    </section>
+
+    <section style="margin-top: 80px; padding-top: 40px; border-top: 1px solid rgba(232, 121, 249, 0.2); text-align: center;">
+      <p style="color: #a8a29e; margin-bottom: 20px; font-family: 'Courier New', monospace; font-size: 14px;">NEXT RESEARCH PROJECT</p>
+      
+      <div style="display: flex; justify-content: center; gap: 20px;">
+        <a href="omnidirectional-platform.html" class="btn-orange">
+          Omnidirectional Robot →
+        </a>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  const hamburger = document.querySelector(".hamburger");
+  const navMenu = document.querySelector(".nav-links");
+  const sections = document.querySelectorAll(".doc-section");
+  const navLinks = document.querySelectorAll(".doc-nav a");
+
+  if(hamburger && navMenu) {
+    hamburger.addEventListener("click", () => {
+      hamburger.classList.toggle("active");
+      navMenu.classList.toggle("active");
+    });
+  }
+
+  window.addEventListener("scroll", () => {
+    let current = "";
+    sections.forEach(sec => {
+      // 150px offset compensates for fixed header/sidebar padding
+      if (scrollY >= sec.offsetTop - 150) {
+        current = sec.getAttribute("id");
+      }
+    });
+
+    navLinks.forEach(link => {
+      link.classList.remove("active");
+      if (current && link.getAttribute("href").includes(current)) {
+        link.classList.add("active");
+      }
+    });
+  });
+</script>
+
+</body>
+</html>

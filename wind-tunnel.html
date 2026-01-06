@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wind Tunnel Research | Himank Bhati</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* --- BLUEPRINT THEME OVERRIDES --- */
+
+    body {
+      background-color: #050505;
+      /* Grid background for blueprint look */
+      background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+
+    /* LAYOUT: SIDEBAR + CONTENT */
+    .doc-container {
+      max-width: 1300px;
+      margin: 120px auto 100px;
+      padding: 0 20px;
+      display: grid;
+      grid-template-columns: 250px 1fr;
+      gap: 60px;
+    }
+
+    /* STICKY SIDEBAR */
+    .doc-sidebar {
+      position: sticky;
+      top: 120px;
+      height: fit-content;
+      padding-right: 20px;
+      border-right: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .doc-nav-title {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #555;
+      margin-bottom: 20px;
+      font-weight: 700;
+    }
+
+    .doc-nav a {
+      display: block;
+      color: #888;
+      text-decoration: none;
+      padding: 10px 0;
+      font-size: 15px;
+      transition: 0.2s;
+      border-left: 2px solid transparent;
+      padding-left: 15px;
+    }
+
+    .doc-nav a:hover, .doc-nav a.active {
+      color: #00eaff;
+      border-left-color: #00eaff;
+    }
+
+    /* CONTENT STYLES */
+    .doc-content h1 {
+      font-size: 48px;
+      font-weight: 800;
+      margin-bottom: 10px;
+      background: linear-gradient(to right, #fff, #888);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .doc-meta {
+      font-family: 'Courier New', monospace;
+      color: #00eaff;
+      margin-bottom: 40px;
+      font-size: 14px;
+    }
+
+    .doc-section {
+      margin-bottom: 80px;
+      scroll-margin-top: 140px;
+    }
+
+    .doc-section h2 {
+      font-size: 28px;
+      color: white;
+      margin-bottom: 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      padding-bottom: 10px;
+    }
+
+    .doc-section p {
+      color: #ccc;
+      font-size: 18px;
+      line-height: 1.8;
+      margin-bottom: 20px;
+    }
+
+    /* --- MEDIA GRID (For Images & Videos) --- */
+    .media-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      gap: 25px;
+      margin-top: 30px;
+    }
+
+    .media-card {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 10px;
+    }
+
+    .media-card video, .media-card img {
+      width: 100%;
+      height: 300px;
+      object-fit: cover;
+      border-radius: 4px;
+      background: #000;
+    }
+
+    .media-caption {
+      margin-top: 10px;
+      font-size: 14px;
+      color: #888;
+      font-family: 'Courier New', monospace;
+    }
+
+    /* TIMELINE */
+    .timeline {
+      border-left: 2px solid rgba(255,255,255,0.1);
+      margin-left: 10px;
+      padding-left: 30px;
+    }
+
+    .timeline-item {
+      position: relative;
+      margin-bottom: 40px;
+    }
+
+    .timeline-item::before {
+      content: "";
+      position: absolute;
+      left: -37px;
+      top: 5px;
+      width: 12px;
+      height: 12px;
+      background: #00eaff;
+      border-radius: 50%;
+      box-shadow: 0 0 10px rgba(0, 234, 255, 0.5);
+    }
+
+    .timeline-title {
+      font-size: 20px;
+      color: white;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 850px) {
+      .doc-container {
+        grid-template-columns: 1fr;
+      }
+      .doc-sidebar {
+        position: relative;
+        top: 0;
+        border-right: none;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        margin-bottom: 40px;
+        padding-bottom: 20px;
+      }
+      .doc-nav {
+        display: flex;
+        overflow-x: auto;
+        gap: 20px;
+      }
+      .media-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header class="navbar">
+  <div class="logo">HIMANK BHATI</div>
+  
+  <div class="hamburger">
+    <span class="bar"></span>
+    <span class="bar"></span>
+    <span class="bar"></span>
+  </div>
+
+  <nav class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="index.html#work">Work</a>
+    <a href="index.html#connect">Connect</a>
+  </nav>
+</header>
+
+<div class="doc-container">
+
+  <aside class="doc-sidebar">
+    <div class="doc-nav-title">Report Contents</div>
+    <nav class="doc-nav">
+      <a href="#overview" class="active">01. Overview</a>
+      <a href="#visuals">02. Visual Analysis</a>
+      <a href="#specs">03. Specifications</a>
+      <a href="#methodology">04. Methodology</a>
+      <a href="#conclusion">05. Conclusion</a>
+    </nav>
+    
+    <div style="margin-top: 40px;">
+      <a href="index.html#work" style="color: #666; text-decoration: none; font-size: 14px;">← Back to Portfolio</a>
+    </div>
+  </aside>
+
+  <main class="doc-content">
+
+    <section id="overview" class="doc-section">
+      <h1>Subsonic Wind Tunnel</h1>
+      <div class="doc-meta">
+        PROJECT ADVISOR: DR. PUNNAG CHATTERJEE 
+      </div>
+
+      <p>
+        <strong>Objective:</strong> To design and validate a low cost subsonic wind tunnel for the undergraduate aerodynamic laboratory at IIT Dharwad. 
+      </p>
+      
+      <p>
+        The primary challenge was to achieve professional-grade flow uniformity while adhering to strict budget constraints. This required a rigorous analysis of design trade-offs regarding the contraction cone, test section, and diffuser geometry.
+      </p>
+    </section>
+
+    <section id="visuals" class="doc-section">
+      <h2>02. Visual Analysis & Fabrication</h2>
+      <p>The following documentation captures the assembly process, drive system, and flow verification tests.</p>
+      
+      <div class="media-grid">
+        
+        <div class="media-card">
+          <video controls autoplay loop muted playsinline>
+            <source src="WindTunnel3-C9dRqc4U.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+          <div class="media-caption">
+            FIG 2.1: FULL ASSEMBLY<br>
+            Showing contraction cone (left), test section (center), and diffuser (right).
+          </div>
+        </div>
+
+        <div class="media-card">
+          <video controls autoplay loop muted playsinline>
+            <source src="WindTunnel4-BLKrSCD3.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+          <div class="media-caption">
+            FIG 2.2: FLOW VISUALIZATION<br>
+            Using tufts to verify laminar flow quality within the test section. Note the flow straightening effect.
+          </div>
+        </div>
+
+        <div class="media-card">
+          <img src="WindTunnel1-.jpeg" alt="Honeycomb flow straightener">
+          <div class="media-caption">
+            FIG 2.3: FLOW CONDITIONING<br>
+            Honeycomb structure and mesh screens installed at the inlet to reduce turbulence intensity.
+          </div>
+        </div>
+
+        <div class="media-card">
+          <img src="WindTunnel2-.jpeg" alt="Fan Suction Mechanism">
+          <div class="media-caption">
+            FIG 2.4: SUCTION UNIT<br>
+            Axial fan configuration mounted at the diffuser exit to drive the airflow.
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <section id="specs" class="doc-section">
+      <h2>03. Technical Specifications</h2>
+      <p>Design parameters were derived from initial analytical calculations to ensure stable operating conditions.</p>
+            
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 20px;">
+        <div style="background: rgba(255,255,255,0.03); padding: 20px; border: 1px solid rgba(255,255,255,0.1);">
+          <div style="font-size: 12px; color: #666; text-transform: uppercase;">Flow Regime</div>
+          <div style="color: white; font-weight: 700; font-size: 18px;">Subsonic</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); padding: 20px; border: 1px solid rgba(255,255,255,0.1);">
+          <div style="font-size: 12px; color: #666; text-transform: uppercase;">Drive Type</div>
+          <div style="color: white; font-weight: 700; font-size: 18px;">Axial Suction</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); padding: 20px; border: 1px solid rgba(255,255,255,0.1);">
+          <div style="font-size: 12px; color: #666; text-transform: uppercase;">Material</div>
+          <div style="color: white; font-weight: 700; font-size: 18px;">Wood & Acrylic</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="methodology" class="doc-section">
+      <h2>04. Methodology</h2>
+      
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-title">Analytical Design</div>
+          <p>
+            Estimated airflow, pressure variations, and operating conditions through analytical calculations. This established the baseline dimensions for the fan and motor selection.
+          </p>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-title">Geometry Refinement</div>
+          <p>
+             Refined the wind tunnel geometry specifically the contraction cone curve and diffuser angle to ensure uniform flow and efficient performance. 
+          </p>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-title">Fabrication & Assembly</div>
+          <p>
+            Constructed the tunnel using wood for the contraction/diffuser and acrylic for the test section to allow optical access. Implemented flow conditioners (honeycomb) to manage turbulence.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section id="conclusion" class="doc-section">
+      <h2>05. Conclusion</h2>
+      <p>
+        The fabricated wind tunnel successfully demonstrates controlled subsonic flow. The tuft visualization tests confirm that the honeycomb straighteners and contraction cone design effectively laminarize the airflow entering the test section, making it a viable tool for undergraduate aerodynamic experiments.
+      </p>
+    </section>
+
+    <section style="margin-top: 80px; padding-top: 40px; border-top: 1px solid rgba(255,255,255,0.1); text-align: center;">
+      <p style="color: #666; margin-bottom: 20px; font-family: 'Courier New', monospace; font-size: 14px;">NEXT RESEARCH PROJECT</p>
+      
+      <div style="display: flex; justify-content: center; gap: 20px;">
+        <a href="smart-polymers.html" class="btn talk-btn" style="background: linear-gradient(90deg, #c77dff, #ff4d8d); border: none; padding: 12px 30px;">
+          Smart Polymers →
+        </a>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  // HAMBURGER
+  const hamburger = document.querySelector(".hamburger");
+  const navMenu = document.querySelector(".nav-links");
+  hamburger.addEventListener("click", () => {
+    hamburger.classList.toggle("active");
+    navMenu.classList.toggle("active");
+  });
+
+  // SCROLL SPY FOR SIDEBAR
+  const sections = document.querySelectorAll(".doc-section");
+  const navLinks = document.querySelectorAll(".doc-nav a");
+
+  window.addEventListener("scroll", () => {
+    let current = "";
+    sections.forEach(sec => {
+      if (scrollY >= sec.offsetTop - 200) {
+        current = sec.getAttribute("id");
+      }
+    });
+
+    navLinks.forEach(link => {
+      link.classList.remove("active");
+      if (link.getAttribute("href").includes(current)) {
+        link.classList.add("active");
+      }
+    });
+  });
+</script>
+
+</body>
+</html>
